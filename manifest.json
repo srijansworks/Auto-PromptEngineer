@@ -4,14 +4,26 @@
   "version": "0.1.0",
   "description": "Improve a prompt with Gemini before you send it to ChatGPT or Claude. You review every change.",
   "minimum_chrome_version": "110",
-  "permissions": ["storage"],
-  "host_permissions": ["https://generativelanguage.googleapis.com/*"],
-  "background": { "service_worker": "src/background.js" },
-  "action": { "default_title": "PromptRelay settings" },
+  "permissions": [
+    "storage",
+    "nativeMessaging"
+  ],
+  "host_permissions": [
+    "https://generativelanguage.googleapis.com/*"
+  ],
+  "background": {
+    "service_worker": "src/background.js"
+  },
+  "action": {
+    "default_title": "PromptRelay settings"
+  },
   "options_page": "src/options/options.html",
   "content_scripts": [
     {
-      "matches": ["https://chatgpt.com/*", "https://claude.ai/*"],
+      "matches": [
+        "https://chatgpt.com/*",
+        "https://claude.ai/*"
+      ],
       "js": [
         "src/core/settings.js",
         "src/core/text.js",
@@ -22,5 +34,6 @@
       ],
       "run_at": "document_idle"
     }
-  ]
+  ],
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuJdh4+7SXXFG9CVqythemUNdw8Tu46Wmt3itPvNU3+TPUgxoRZ5qJsYqjbbkHBLlP1WHki2WA8iPDhSYAYMUiXiY4SMx9y4RWtV54TpWr5GUP29UUGn3z0jEWC1nAAuLVjaAipjgPg/w6zdaCMmIk+a1WwRWVCDGatnTn7cuT+k47fLDTVLyQpqYOq8j+jFsTXV2l5OUsyQsAXdspFaPMP59CN9CPYxTiopUvtGoCDibUW5NwNJIQYYBX6/IIqeat5J/qpp2RbULMH2JD2xXwWmk+Dbnd3pnGOg4m81miIDzIFoiJY9fwaJL/QrQUzIbyhEFcSLSuNfY5iIIsizP3wIDAQAB"
 }

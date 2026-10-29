@@ -81,15 +81,43 @@ While the panel is open, Enter and the send button in the message box are blocke
 
 ## Status and testing
 
-Run `npm test`. It runs 33 unit tests for the interception rules, settings validation, Gemini request and response handling, and text safety checks. No dependencies are needed.
+Run `npm test`. It runs 50 tests: interception rules, settings validation, Gemini request and response handling, text safety checks, the native messaging protocol, Cursor argument safety and output parsing, and end to end runs of the helper against a fake Cursor program. No dependencies are needed.
 
-The content script flow (manual actions, interception, errors, stale draft handling) was also exercised in a browser against a local fixture page that imitates a ProseMirror composer. That page is `test/fixture/index.html`.
+The content script flow (manual actions, interception, errors, stale draft handling) was also exercised in a browser against a local fixture page that imitates a ProseMirror composer, including the Cursor section with stubbed replies. That page is `test/fixture/index.html`.
 
 It has not been verified against live chatgpt.com or claude.ai. Load it, try both sites, and expect to adjust selectors once.
 
-## Cursor CLI review (not built yet)
+## Cursor as a second reviewer (coding prompts)
 
-An optional code review step through the Cursor CLI is planned but not implemented. A browser extension cannot run local commands, so it would need a small local helper registered through Chrome native messaging, called only for prompts you mark as coding tasks. That is deliberately left out of this MVP.
+Gemini improves the prompt first. For coding work you can then click Review with Cursor in the review panel. Cursor redesigns the prompt for a coding agent: one sentence goal, context with [placeholders] for anything unknown, numbered testable requirements, input and output examples, a counted list of edge cases, constraints and non-goals, a numbered acceptance checklist with the commands to run, a plan of at most 5 steps first, and how to report back. It also lists gaps and risks it found in the Gemini version.
+
+Cursor's version is shown in its own box and is not applied until you click Use Cursor version in the editor. You can click Restore Gemini version, edit freely, and then choose Replace draft, Approve and send, Keep original, or Cancel as usual. If Cursor decides the prompt is not a coding task, it says so and changes nothing.
+
+### Setup
+
+1. Install the Cursor CLI and sign in. The command is `agent` (some installs call it `cursor-agent`). Run `agent login` once, or set `CURSOR_API_KEY`.
+2. From the project folder, register the helper for your browser:
+
+```bash
+node helper/install.js --browser chrome
+```
+
+   Use `brave`, `edge` or `chromium` for those browsers. Run it again if you install Cursor later or move the project folder. `node helper/install.js --uninstall` removes everything it created.
+3. Reload the extension at `chrome://extensions`.
+4. In PromptRelay settings, tick the Cursor option and click Test Cursor helper. It reports the Cursor version and whether you are signed in.
+
+The extension has a fixed ID, set by the `key` field in `manifest.json`, so the installer can authorize it without you looking anything up. Only that extension can talk to the helper.
+
+### What Cursor can and cannot do
+
+- It runs only when you click the button.
+- It runs in a new, empty temporary folder that is deleted afterwards. It has no access to your code.
+- The helper runs one fixed command with no shell: `agent -p --output-format text --mode ask --sandbox enabled --trust --workspace <empty folder> <prompt>`. It never passes `--force` or `--yolo`, and a test enforces that.
+- It has a 120 second limit and an output size cap.
+- It uses your Cursor plan, separate from Gemini.
+- The prompt is passed as a command argument, so it is briefly visible to other programs on your Mac that list processes. The Cursor docs do not describe reading it from stdin.
+
+Not verified: Cursor is not installed on the machine where this was built, so the helper was tested end to end against a fake `agent` program, and the flags come from Cursor's documentation. Cursor's own docs do not say exactly what ask mode restricts, which is why the empty folder is the real protection. Run Test Cursor helper first, and if a flag has changed, `helper/lib.js` (`buildArgs`) is the one place to edit.
 
 ## Layout
 
@@ -99,5 +127,6 @@ src/background.js        Gemini calls, key handling, sender checks
 src/core/                settings, text checks, interception rules, prompt, Gemini client
 src/content/             site adapters, review panel UI, content script
 src/options/             settings page
+helper/                  native messaging host and installer for the Cursor review
 test/                    unit tests and browser fixture
 ```

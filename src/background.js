@@ -37,6 +37,29 @@ async function runOptimize(text, model) {
   });
 }
 
+const HOST = 'com.promptrelay.host';
+const CURSOR_TIMEOUT_MS = 150000;
+
+function callHost(payload) {
+  const call = new Promise((resolve) => {
+    chrome.runtime.sendNativeMessage(HOST, payload, (res) => {
+      if (chrome.runtime.lastError || !res) {
+        resolve({
+          ok: false,
+          code: 'no_helper',
+          message: 'The PromptRelay helper is not installed. Run "node helper/install.js" from the project folder, then reload the extension.',
+        });
+      } else {
+        resolve(res);
+      }
+    });
+  });
+  const timeout = new Promise((resolve) =>
+    setTimeout(() => resolve({ ok: false, code: 'timeout', message: 'Cursor did not answer in time.' }), CURSOR_TIMEOUT_MS)
+  );
+  return Promise.race([call, timeout]);
+}
+
 async function handle(msg, sender) {
   if (sender.id !== chrome.runtime.id || !msg || typeof msg.type !== 'string') {
     return { ok: false, code: 'forbidden', message: 'Unexpected sender.' };
@@ -57,6 +80,29 @@ async function handle(msg, sender) {
     }
     return runOptimize(msg.text);
   }
+
+  if (msg.type === 'cursorReview') {
+    if (typeof msg.original !== 'string' || typeof msg.improved !== 'string') {
+      return { ok: false, code: 'bad_request', message: 'Missing prompt text.' };
+    }
+    const settings = await loadSettings();
+    if (!settings.cursor.enabled) {
+      return { ok: false, code: 'forbidden', message: 'Cursor review is turned off in PromptRelay settings.' };
+    }
+    if (fromTab) {
+      let site = null;
+      try {
+        site = PR.settings.siteFromHost(new URL(sender.tab.url).hostname);
+      } catch (_) {}
+      if (!site || !settings.sites[site].enabled) {
+        return { ok: false, code: 'forbidden', message: 'PromptRelay is disabled on this site.' };
+      }
+    }
+    return callHost({ type: 'review', original: msg.original, improved: msg.improved });
+  }
+
+  // Settings page only: never accepted from a web page's content script.
+  if (msg.type === 'cursorStatus' && !fromTab) return callHost({ type: 'ping' });
 
   // Settings page only: never accepted from a web page's content script.
   if (msg.type === 'testConnection' && !fromTab) {

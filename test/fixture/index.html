@@ -11,9 +11,9 @@
   window.sent = [];
   window.stub = { intercept: false, reply: { ok: true, improved: 'Improved: explain TCP.', changes: ['Clarified.'], openQuestions: [], unchanged: false } };
   window.chrome = {
-    runtime: { sendMessage: async () => window.stub.reply },
+    runtime: { sendMessage: async (m) => (m.type === 'cursorReview' ? (window.stub.cursor || { ok: false, message: 'no stub' }) : window.stub.reply) },
     storage: {
-      sync: { get: async () => ({ settings: { sites: { chatgpt: { enabled: true, intercept: window.stub.intercept } } } }) },
+      sync: { get: async () => ({ settings: { cursor: { enabled: true }, sites: { chatgpt: { enabled: true, intercept: window.stub.intercept } } } }) },
       onChanged: { addListener(fn) { window.__onChanged = fn; } },
     },
   };

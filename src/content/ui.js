@@ -24,6 +24,9 @@
     .note { padding:8px 10px; border-radius:8px; font-size:12.5px; line-height:1.4; background:var(--pane); }
     .note ul { margin:4px 0 0; padding-left:18px; }
     .note b { font-weight:600; }
+    .cursorbox textarea { display:block; width:100%; margin-top:8px; min-height:180px; max-height:40vh; padding:10px; border:1px solid var(--line); border-radius:8px; background:var(--pane); color:var(--fg); font-size:13.5px; line-height:1.45; resize:vertical; }
+    .cursorbox .actions { margin-top:8px; display:flex; gap:8px; }
+    .cursorbox .tag2 { font-size:11px; color:var(--muted); }
     .warn { background:var(--warn-bg); color:var(--warn-fg); }
     .err { background:var(--err-bg); color:var(--err-fg); }
     .state { padding:28px 8px; text-align:center; color:var(--muted); font-size:14px; }
@@ -80,6 +83,7 @@
     let toastTimer = 0;
     let panelEl = null;
     let edited = null;
+    let review = null; // live refs for the open review panel (Cursor section)
     let noticeBox = null;
 
     function mount() {
@@ -155,7 +159,7 @@
         );
       },
 
-      showReview({ original, improved, changes, assumptions, openQuestions, warnings, unchanged, trigger }) {
+      showReview({ original, improved, changes, assumptions, openQuestions, warnings, unchanged, trigger, cursorEnabled }) {
         const ta = h('textarea', { 'aria-label': 'Improved prompt, editable', spellcheck: 'false' });
         ta.value = improved;
         edited = ta;
@@ -168,6 +172,9 @@
         const approveBtn = btn('Approve and send', () => cb.onApprove(ta.value), 'primary');
         primaries.push(replaceBtn, approveBtn);
         refresh();
+        const cursorBox = h('div', { class: 'cursorbox' });
+        const cursorBtn = cursorEnabled ? btn('Review with Cursor', () => cb.onCursor(ta.value)) : null;
+        review = { ta, cursorBox, cursorBtn, refresh, geminiText: improved, token: 0 };
         const warnItems = (warnings || []).map((w) => w.kind + ' missing from the improved version: ' + w.value.slice(0, 80));
         openPanel(
           unchanged ? 'Gemini found nothing to change' : 'Review the improved prompt',
@@ -175,12 +182,14 @@
             h('div', { class: 'cols' },
               h('div', { class: 'col' }, h('label', {}, 'Original'), orig),
               h('div', { class: 'col' }, h('label', {}, 'Improved (editable)'), ta)),
+            cursorBox,
             list('Assumptions I made (edit the prompt if wrong)', assumptions),
             list('Changes', changes),
             list('Questions you may want to answer', openQuestions),
             list('Check before sending', warnItems, 'warn'),
           ],
           [
+            cursorBtn,
             btn('Copy improved', () => {
               navigator.clipboard.writeText(ta.value).then(
                 () => api.toast('Copied.'),
@@ -215,11 +224,61 @@
         panelEl.classList.add('pulse');
       },
 
+      cursorLoading() {
+        if (!review) return;
+        review.cursorBox.replaceChildren(h('div', { class: 'note' }, 'Cursor is redesigning the prompt for coding. This can take up to a minute. Nothing is sent to ChatGPT or Claude.'));
+        if (review.cursorBtn) review.cursorBtn.disabled = true;
+      },
+
+      cursorError(message) {
+        if (!review) return;
+        review.cursorBox.replaceChildren(h('div', { class: 'note err' }, message));
+        if (review.cursorBtn) review.cursorBtn.disabled = false;
+      },
+
+      cursorResult(r) {
+        if (!review) return;
+        const rv = review;
+        if (rv.cursorBtn) rv.cursorBtn.disabled = false;
+        if (!r.isCoding) {
+          rv.cursorBox.replaceChildren(
+            h('div', { class: 'note' }, h('b', {}, 'Cursor: this does not look like a coding task, so it made no redesign.'), h('ul', {}, (r.issues || []).map((i) => h('li', {}, i))))
+          );
+          return;
+        }
+        const preview = h('textarea', { 'aria-label': 'Cursor redesigned prompt', readonly: true, spellcheck: 'false' });
+        preview.value = r.redesigned;
+        preview.style.minHeight = '180px';
+        const useBtn = btn('Use Cursor version in the editor', () => {
+          rv.ta.value = r.redesigned;
+          rv.refresh();
+          rv.ta.focus();
+          api.toast('Cursor version placed in the editor. Review it, then choose an action.');
+        });
+        const backBtn = btn('Restore Gemini version', () => {
+          rv.ta.value = rv.geminiText;
+          rv.refresh();
+        });
+        const warn = (r.warnings || []).map((w) => w.kind + ' missing from the Cursor version: ' + w.value.slice(0, 80));
+        rv.cursorBox.replaceChildren(
+          h('div', { class: 'note' },
+            h('b', {}, 'Cursor second review'),
+            h('div', { class: 'tag2' }, 'Redesigned for a coding agent. Not applied until you use it.'),
+            preview,
+            h('div', { class: 'actions' }, useBtn, backBtn)),
+          list('Gaps and risks Cursor found', r.issues),
+          list('What Cursor changed', r.changes),
+          list('Cursor assumptions', r.assumptions),
+          list('Check before sending', warn, 'warn')
+        );
+      },
+
       hide() {
         overlay.style.display = 'none';
         overlay.replaceChildren();
         panelEl = null;
         edited = null;
+        review = null;
         noticeBox = null;
       },
     };

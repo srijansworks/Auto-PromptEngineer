@@ -5,6 +5,7 @@
     maxChars: 20000,
     style: 'expand',
     profile: '',
+    cursor: { enabled: false },
     sites: {
       chatgpt: { enabled: true, intercept: false },
       claude: { enabled: true, intercept: false },
@@ -48,6 +49,7 @@
       model,
       style: src.style === 'faithful' ? 'faithful' : 'expand',
       profile: typeof src.profile === 'string' ? src.profile.slice(0, 2000) : '',
+      cursor: { enabled: Boolean(src.cursor) && src.cursor.enabled === true },
       timeoutMs: clampInt(src.timeoutMs, 5000, 120000, DEFAULTS.timeoutMs),
       maxChars: clampInt(src.maxChars, 500, 100000, DEFAULTS.maxChars),
       sites,

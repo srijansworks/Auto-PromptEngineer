@@ -20,6 +20,7 @@
     $('model').value = s.model;
     $('style').value = s.style;
     $('profile').value = s.profile;
+    $('cursor-enabled').checked = s.cursor.enabled;
     $('maxChars').value = s.maxChars;
     $('timeout').value = Math.round(s.timeoutMs / 1000);
     for (const id of SITES) {
@@ -38,6 +39,7 @@
       model: $('model').value,
       style: $('style').value,
       profile: $('profile').value,
+      cursor: { enabled: $('cursor-enabled').checked },
       maxChars: $('maxChars').value,
       timeoutMs: Number($('timeout').value) * 1000,
       sites,
@@ -63,6 +65,13 @@
     say('Testing...');
     const res = await chrome.runtime.sendMessage({ type: 'testConnection', model: s.model });
     say(res && res.ok ? 'Connection works.' : (res && res.message) || 'Test failed.', !(res && res.ok));
+  });
+
+  $('testCursor').addEventListener('click', async () => {
+    say('Checking the Cursor helper...');
+    const r = await chrome.runtime.sendMessage({ type: 'cursorStatus' });
+    if (!r || !r.ok) return say((r && r.message) || 'No answer from the helper.', true);
+    say('Helper works. Cursor ' + (r.version || '') + '. ' + (r.loggedIn ? 'Signed in.' : 'Not signed in: run "agent login" in a terminal. ' + (r.status || '')), !r.loggedIn);
   });
 
   $('removeKey').addEventListener('click', async () => {

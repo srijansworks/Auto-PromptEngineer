@@ -39,3 +39,10 @@ test('style defaults to expand and profile is capped', () => {
   assert.strictEqual(S.sanitize({ profile: 'x'.repeat(5000) }).profile.length, 2000);
   assert.strictEqual(S.sanitize({ profile: 42 }).profile, '');
 });
+
+test('cursor review is off by default and only a literal true turns it on', () => {
+  assert.strictEqual(S.sanitize(undefined).cursor.enabled, false);
+  assert.strictEqual(S.sanitize({ cursor: { enabled: 'yes' } }).cursor.enabled, false);
+  assert.strictEqual(S.sanitize({ cursor: { enabled: true } }).cursor.enabled, true);
+  assert.strictEqual(S.sanitize({ cursor: null }).cursor.enabled, false);
+});

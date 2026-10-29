@@ -33,6 +33,7 @@
     onReplace: (text) => replace(text, false),
     onApprove: (text) => replace(text, true),
     onKeep: () => keep(),
+    onCursor: (text) => askCursor(text),
   });
 
   function close() {
@@ -108,6 +109,25 @@
       unchanged: res.unchanged,
       warnings: PR.text.findDroppedLiterals(s.original, res.improved),
       trigger: s.trigger,
+      cursorEnabled: settings.cursor.enabled,
+    });
+  }
+
+  async function askCursor(text) {
+    const s = state.session;
+    if (!s || s.working || s.cursorBusy || !text.trim()) return;
+    s.cursorBusy = true;
+    ui.cursorLoading();
+    const res = await ask({ type: 'cursorReview', original: s.original, improved: text });
+    if (state.session !== s) return;
+    s.cursorBusy = false;
+    if (!res.ok) {
+      ui.cursorError(res.message || 'Cursor review failed.');
+      return;
+    }
+    ui.cursorResult({
+      ...res,
+      warnings: res.redesigned ? PR.text.findDroppedLiterals(s.original, res.redesigned) : [],
     });
   }
 

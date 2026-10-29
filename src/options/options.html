@@ -41,6 +41,11 @@
   <textarea id="profile" rows="6" maxlength="2000" placeholder="Example: Final year EE student. Skills: Python, ROS, PX4, computer vision. Goal: robotics or drone autonomy role in the US by mid 2027. Location: ..."></textarea>
   <p class="hint">Sent to Gemini with every improve request in Expand style, so keep it free of secrets. Up to 2000 characters. Leave empty and the rewritten prompt will include a line for you to fill in.</p>
 
+  <h2>Cursor second reviewer (coding prompts)</h2>
+  <div class="row"><input type="checkbox" id="cursor-enabled"><label for="cursor-enabled">Show a Review with Cursor button in the review panel</label></div>
+  <p class="hint">Cursor redesigns the improved prompt for a coding agent: numbered requirements, edge cases, acceptance criteria and a plan first. It runs only when you click the button, in an empty temporary folder with no access to your code, and never edits anything. It needs the helper from <code>helper/install.js</code> and the Cursor CLI, and it uses your Cursor plan. You still choose what gets sent.</p>
+  <div class="row"><button id="testCursor" type="button">Test Cursor helper</button></div>
+
   <h2>Sites</h2>
   <div class="box">
     <strong>ChatGPT (chatgpt.com)</strong>
