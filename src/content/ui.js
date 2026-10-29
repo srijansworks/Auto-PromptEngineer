@@ -11,7 +11,7 @@
     .fab[disabled] { opacity:.55; cursor:default; }
     .fab .tag { margin-left:6px; padding:1px 6px; border-radius:8px; background:var(--accent); color:var(--accent-fg); font-size:10.5px; }
     .overlay { position:fixed; inset:0; z-index:2147483001; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,.45); }
-    .panel { width:min(980px, 94vw); max-height:90vh; display:flex; flex-direction:column; background:var(--bg); color:var(--fg); border:1px solid var(--line); border-radius:12px; box-shadow:0 8px 40px rgba(0,0,0,.35); }
+    .panel { width:min(1100px, 95vw); max-height:90vh; display:flex; flex-direction:column; background:var(--bg); color:var(--fg); border:1px solid var(--line); border-radius:12px; box-shadow:0 8px 40px rgba(0,0,0,.35); }
     .head { display:flex; justify-content:space-between; align-items:baseline; padding:12px 16px; border-bottom:1px solid var(--line); }
     .head h2 { margin:0; font-size:15px; font-weight:600; }
     .head .sub { font-size:12px; color:var(--muted); }
@@ -19,7 +19,7 @@
     .cols { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
     @media (max-width:720px) { .cols { grid-template-columns:1fr; } }
     .col label { display:block; margin-bottom:4px; font-size:12px; font-weight:600; color:var(--muted); }
-    .col textarea, .col .orig { width:100%; min-height:220px; max-height:46vh; padding:10px; border:1px solid var(--line); border-radius:8px; background:var(--pane); color:var(--fg); font-size:13.5px; line-height:1.45; resize:vertical; overflow:auto; white-space:pre-wrap; }
+    .col textarea, .col .orig { width:100%; min-height:260px; max-height:52vh; padding:10px; border:1px solid var(--line); border-radius:8px; background:var(--pane); color:var(--fg); font-size:13.5px; line-height:1.45; resize:vertical; overflow:auto; white-space:pre-wrap; }
     .col textarea:focus { outline:2px solid var(--accent); }
     .note { padding:8px 10px; border-radius:8px; font-size:12.5px; line-height:1.4; background:var(--pane); }
     .note ul { margin:4px 0 0; padding-left:18px; }
@@ -155,7 +155,7 @@
         );
       },
 
-      showReview({ original, improved, changes, openQuestions, warnings, unchanged, trigger }) {
+      showReview({ original, improved, changes, assumptions, openQuestions, warnings, unchanged, trigger }) {
         const ta = h('textarea', { 'aria-label': 'Improved prompt, editable', spellcheck: 'false' });
         ta.value = improved;
         edited = ta;
@@ -175,6 +175,7 @@
             h('div', { class: 'cols' },
               h('div', { class: 'col' }, h('label', {}, 'Original'), orig),
               h('div', { class: 'col' }, h('label', {}, 'Improved (editable)'), ta)),
+            list('Assumptions I made (edit the prompt if wrong)', assumptions),
             list('Changes', changes),
             list('Questions you may want to answer', openQuestions),
             list('Check before sending', warnItems, 'warn'),

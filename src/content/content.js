@@ -103,6 +103,7 @@
       original: s.original,
       improved: res.improved,
       changes: res.changes,
+      assumptions: res.assumptions,
       openQuestions: res.openQuestions,
       unchanged: res.unchanged,
       warnings: PR.text.findDroppedLiterals(s.original, res.improved),

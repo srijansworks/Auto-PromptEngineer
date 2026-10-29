@@ -32,6 +32,8 @@ async function runOptimize(text, model) {
     text,
     timeoutMs: settings.timeoutMs,
     maxChars: settings.maxChars,
+    style: settings.style,
+    profile: settings.profile,
   });
 }
 

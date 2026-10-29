@@ -12,12 +12,12 @@
 
   // The API key goes in a header, never in the URL, so it cannot leak into
   // logs or error messages that include the URL.
-  function buildRequest({ model, apiKey, text, nonce }) {
+  function buildRequest({ model, apiKey, text, nonce, style, profile }) {
     const body = {
-      systemInstruction: { parts: [{ text: prompt.SYSTEM_INSTRUCTION }] },
-      contents: [{ role: 'user', parts: [{ text: prompt.buildUserMessage(text, nonce) }] }],
+      systemInstruction: { parts: [{ text: prompt.systemInstruction(style) }] },
+      contents: [{ role: 'user', parts: [{ text: prompt.buildUserMessage(text, nonce, profile) }] }],
       generationConfig: {
-        temperature: 0.2,
+        temperature: style === 'faithful' ? 0.2 : 0.4,
         maxOutputTokens: 16384,
         responseMimeType: 'application/json',
         responseSchema: prompt.RESPONSE_SCHEMA,
@@ -58,7 +58,7 @@
     return fail('http', 'Gemini returned an error (' + status + ').' + detail);
   }
 
-  function parseResponse(status, data, original) {
+  function parseResponse(status, data, original, style) {
     if (status < 200 || status >= 300) return httpError(status, data);
     if (data && data.promptFeedback && data.promptFeedback.blockReason) {
       return fail('blocked', 'Gemini blocked this prompt (' + data.promptFeedback.blockReason + ').');
@@ -84,7 +84,8 @@
       return fail('bad_response', 'Gemini returned an empty improved prompt.');
     }
     const improved = parsed.improved_prompt.replace(/\r\n?/g, '\n').trim();
-    if (improved.length > original.length * 4 + 2000) {
+    const limit = style === 'faithful' ? original.length * 4 + 2000 : original.length * 8 + 6000;
+    if (improved.length > limit) {
       return fail('bad_response', 'Gemini returned a prompt far longer than the original. Discarded for safety.');
     }
     const list = (v, n) =>
@@ -93,12 +94,13 @@
       ok: true,
       improved,
       changes: list(parsed.changes, 6),
+      assumptions: list(parsed.assumptions, 6),
       openQuestions: list(parsed.open_questions, 3),
       unchanged: parsed.unchanged === true,
     };
   }
 
-  async function optimize({ fetchImpl, apiKey, model, text, timeoutMs, maxChars, nonce }) {
+  async function optimize({ fetchImpl, apiKey, model, text, timeoutMs, maxChars, nonce, style, profile }) {
     if (!apiKey) return fail('no_key', 'No Gemini API key is set. Open PromptRelay settings and add one.');
     if (!text || !text.trim()) return fail('empty', 'There is no text to improve.');
     if (text.length > maxChars) {
@@ -109,6 +111,8 @@
       model,
       apiKey,
       text,
+      style,
+      profile,
       nonce: nonce || globalThis.crypto.randomUUID().replace(/-/g, '').slice(0, 12),
     });
     const ctrl = new AbortController();
@@ -121,7 +125,7 @@
       } catch (_) {
         /* non JSON body; handled by status below */
       }
-      return parseResponse(res.status, data, text);
+      return parseResponse(res.status, data, text, style);
     } catch (err) {
       if (err && err.name === 'AbortError') {
         return fail('timeout', 'Gemini did not answer within ' + Math.round(timeoutMs / 1000) + ' seconds.');

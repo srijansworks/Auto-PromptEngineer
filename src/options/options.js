@@ -18,6 +18,8 @@
     const { settings } = await chrome.storage.sync.get('settings');
     const s = S.sanitize(settings);
     $('model').value = s.model;
+    $('style').value = s.style;
+    $('profile').value = s.profile;
     $('maxChars').value = s.maxChars;
     $('timeout').value = Math.round(s.timeoutMs / 1000);
     for (const id of SITES) {
@@ -34,6 +36,8 @@
     }
     const next = S.sanitize({
       model: $('model').value,
+      style: $('style').value,
+      profile: $('profile').value,
       maxChars: $('maxChars').value,
       timeoutMs: Number($('timeout').value) * 1000,
       sites,

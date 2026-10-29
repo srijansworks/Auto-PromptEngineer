@@ -9,7 +9,7 @@
     body { font:14px/1.5 system-ui, -apple-system, sans-serif; max-width:640px; margin:32px auto; padding:0 16px; }
     h1 { font-size:20px; } h2 { font-size:15px; margin-top:28px; }
     label { display:block; margin:12px 0 4px; font-weight:600; }
-    input[type=text], input[type=password], input[type=number] { width:100%; padding:7px 9px; border:1px solid var(--line); border-radius:6px; font:inherit; background:transparent; color:inherit; }
+    input[type=text], input[type=password], input[type=number], select, textarea { width:100%; padding:7px 9px; border:1px solid var(--line); border-radius:6px; font:inherit; background:transparent; color:inherit; }
     .row { display:flex; gap:8px; align-items:center; margin:6px 0; } .row label { margin:0; font-weight:400; }
     button { padding:7px 14px; border-radius:6px; border:1px solid var(--line); background:transparent; color:inherit; font:inherit; cursor:pointer; }
     button.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
@@ -30,6 +30,16 @@
   <label for="model">Model</label>
   <input id="model" type="text" spellcheck="false">
   <p class="hint">Model names change over time. If requests fail with a model error, pick a current one from the Gemini API docs.</p>
+
+  <h2>How prompts are rewritten</h2>
+  <label for="style">Style</label>
+  <select id="style">
+    <option value="expand">Expand: add numbers, criteria, structure and depth (default)</option>
+    <option value="faithful">Faithful: only clarify, never add requirements</option>
+  </select>
+  <label for="profile">About me (used to personalize prompts)</label>
+  <textarea id="profile" rows="6" maxlength="2000" placeholder="Example: Final year EE student. Skills: Python, ROS, PX4, computer vision. Goal: robotics or drone autonomy role in the US by mid 2027. Location: ..."></textarea>
+  <p class="hint">Sent to Gemini with every improve request in Expand style, so keep it free of secrets. Up to 2000 characters. Leave empty and the rewritten prompt will include a line for you to fill in.</p>
 
   <h2>Sites</h2>
   <div class="box">

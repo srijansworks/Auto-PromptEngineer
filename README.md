@@ -1,6 +1,6 @@
 # PromptRelay
 
-PromptRelay is a personal Chromium extension. You write a prompt in ChatGPT or Claude, click Improve prompt, and Gemini rewrites it for clarity without changing what you want. You review the result, edit it if you like, and decide what gets sent.
+PromptRelay is a personal Chromium extension. You write a prompt in ChatGPT or Claude, click Improve prompt, and Gemini rewrites it into a detailed, numbered, specific prompt without changing what you want. You review the result, edit it if you like, and decide what gets sent.
 
 The final answer is still generated in your normal ChatGPT or Claude browser session. PromptRelay does not call any OpenAI or Anthropic API.
 
@@ -37,6 +37,19 @@ Manual mode is the default.
 
 Warnings appear if code blocks, inline code or URLs from your original are missing from the improved version.
 
+## Rewrite styles
+
+Set the style in settings.
+
+- **Expand (default):** turns a short or vague draft into a spec. It sets exact counts, numeric criteria and thresholds, scoring scales, a numbered output structure, reasoning and risks per item, ranked skills, concrete next steps with deadlines, and a request to flag uncertain facts. Vague words such as "cool" or "best" become measurable criteria. For coding drafts it adds language and version, example inputs and outputs, edge cases, tests, a numbered acceptance checklist and a short plan before code. Casual one line questions get a light touch.
+- **Faithful:** only clarifies wording. It never adds requirements.
+
+Every number or interpretation Expand chooses for you is listed under "Assumptions I made" in the review panel, so you can change it before sending.
+
+**About me:** a short profile in settings (skills, experience, goals, location). In Expand style the rewritten prompt asks the assistant to explain how each item applies to you, using only the facts you wrote. With no profile, the prompt includes a "My background: [fill in]" line. The profile is sent to Gemini with each request, so keep secrets out of it.
+
+Gemini follows these rules most of the time, not always. Review the result before sending.
+
 ## Interception mode (opt in, per site)
 
 Turn it on in settings for ChatGPT, Claude, or both. When on, PromptRelay opens the review panel before these tested submission paths send your text:
@@ -68,13 +81,13 @@ While the panel is open, Enter and the send button in the message box are blocke
 
 ## Status and testing
 
-Run `npm test`. It runs 24 unit tests for the interception rules, settings validation, Gemini request and response handling, and text safety checks. No dependencies are needed.
+Run `npm test`. It runs 33 unit tests for the interception rules, settings validation, Gemini request and response handling, and text safety checks. No dependencies are needed.
 
 The content script flow (manual actions, interception, errors, stale draft handling) was also exercised in a browser against a local fixture page that imitates a ProseMirror composer. That page is `test/fixture/index.html`.
 
 It has not been verified against live chatgpt.com or claude.ai. Load it, try both sites, and expect to adjust selectors once.
 
-## Cursor CLI review (not built)
+## Cursor CLI review (not built yet)
 
 An optional code review step through the Cursor CLI is planned but not implemented. A browser extension cannot run local commands, so it would need a small local helper registered through Chrome native messaging, called only for prompts you mark as coding tasks. That is deliberately left out of this MVP.
 

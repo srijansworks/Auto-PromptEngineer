@@ -3,6 +3,8 @@
     model: 'gemini-2.5-flash',
     timeoutMs: 30000,
     maxChars: 20000,
+    style: 'expand',
+    profile: '',
     sites: {
       chatgpt: { enabled: true, intercept: false },
       claude: { enabled: true, intercept: false },
@@ -44,6 +46,8 @@
     }
     return {
       model,
+      style: src.style === 'faithful' ? 'faithful' : 'expand',
+      profile: typeof src.profile === 'string' ? src.profile.slice(0, 2000) : '',
       timeoutMs: clampInt(src.timeoutMs, 5000, 120000, DEFAULTS.timeoutMs),
       maxChars: clampInt(src.maxChars, 500, 100000, DEFAULTS.maxChars),
       sites,

@@ -31,3 +31,11 @@ test('siteFromHost only matches the supported hosts', () => {
   assert.strictEqual(S.siteFromHost('evilchatgpt.com'), null);
   assert.strictEqual(S.siteFromHost('chatgpt.com.evil.test'), null);
 });
+
+test('style defaults to expand and profile is capped', () => {
+  assert.strictEqual(S.sanitize(undefined).style, 'expand');
+  assert.strictEqual(S.sanitize({ style: 'faithful' }).style, 'faithful');
+  assert.strictEqual(S.sanitize({ style: 'weird' }).style, 'expand');
+  assert.strictEqual(S.sanitize({ profile: 'x'.repeat(5000) }).profile.length, 2000);
+  assert.strictEqual(S.sanitize({ profile: 42 }).profile, '');
+});
