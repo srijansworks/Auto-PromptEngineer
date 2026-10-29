@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "PromptRelay",
+  "version": "0.1.0",
+  "description": "Improve a prompt with Gemini before you send it to ChatGPT or Claude. You review every change.",
+  "minimum_chrome_version": "110",
+  "permissions": ["storage"],
+  "host_permissions": ["https://generativelanguage.googleapis.com/*"],
+  "background": { "service_worker": "src/background.js" },
+  "action": { "default_title": "PromptRelay settings" },
+  "options_page": "src/options/options.html",
+  "content_scripts": [
+    {
+      "matches": ["https://chatgpt.com/*", "https://claude.ai/*"],
+      "js": [
+        "src/core/settings.js",
+        "src/core/text.js",
+        "src/core/intercept.js",
+        "src/content/adapters.js",
+        "src/content/ui.js",
+        "src/content/content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}

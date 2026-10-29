@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>PromptRelay settings</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root { color-scheme: light dark; --line:#c9c9d0; --accent:#2f5bd8; }
+    body { font:14px/1.5 system-ui, -apple-system, sans-serif; max-width:640px; margin:32px auto; padding:0 16px; }
+    h1 { font-size:20px; } h2 { font-size:15px; margin-top:28px; }
+    label { display:block; margin:12px 0 4px; font-weight:600; }
+    input[type=text], input[type=password], input[type=number] { width:100%; padding:7px 9px; border:1px solid var(--line); border-radius:6px; font:inherit; background:transparent; color:inherit; }
+    .row { display:flex; gap:8px; align-items:center; margin:6px 0; } .row label { margin:0; font-weight:400; }
+    button { padding:7px 14px; border-radius:6px; border:1px solid var(--line); background:transparent; color:inherit; font:inherit; cursor:pointer; }
+    button.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
+    .hint { color:#7a7a85; font-size:12.5px; margin:4px 0; }
+    #status { margin-top:14px; min-height:1.4em; }
+    .box { border:1px solid var(--line); border-radius:8px; padding:10px 12px; margin-top:8px; }
+  </style>
+</head>
+<body>
+  <h1>PromptRelay settings</h1>
+  <p class="hint">Your draft text is sent to the Gemini API when you click Improve prompt or when interception is on. It is not sent anywhere else.</p>
+
+  <h2>Gemini</h2>
+  <label for="key">Gemini API key</label>
+  <input id="key" type="password" autocomplete="off" spellcheck="false" placeholder="Paste a key from Google AI Studio">
+  <p class="hint" id="keyState"></p>
+  <p class="hint">This key is separate from any ChatGPT or Claude subscription. Gemini API usage has its own free tier limits and possible charges. Check your Google account terms, including how free tier data may be used.</p>
+  <label for="model">Model</label>
+  <input id="model" type="text" spellcheck="false">
+  <p class="hint">Model names change over time. If requests fail with a model error, pick a current one from the Gemini API docs.</p>
+
+  <h2>Sites</h2>
+  <div class="box">
+    <strong>ChatGPT (chatgpt.com)</strong>
+    <div class="row"><input type="checkbox" id="chatgpt-enabled"><label for="chatgpt-enabled">Show the Improve prompt button</label></div>
+    <div class="row"><input type="checkbox" id="chatgpt-intercept"><label for="chatgpt-intercept">Intercept Enter and the send button</label></div>
+  </div>
+  <div class="box">
+    <strong>Claude (claude.ai)</strong>
+    <div class="row"><input type="checkbox" id="claude-enabled"><label for="claude-enabled">Show the Improve prompt button</label></div>
+    <div class="row"><input type="checkbox" id="claude-intercept"><label for="claude-intercept">Intercept Enter and the send button</label></div>
+  </div>
+  <p class="hint">Interception covers the tested submission paths only: plain Enter, Ctrl or Cmd plus Enter, and a click on the send button in the main message box. Shift+Enter still adds a newline. Other ways a site might submit are not covered.</p>
+
+  <h2>Limits</h2>
+  <label for="maxChars">Longest prompt to send (characters)</label>
+  <input id="maxChars" type="number" min="500" max="100000">
+  <label for="timeout">Timeout (seconds)</label>
+  <input id="timeout" type="number" min="5" max="120">
+
+  <div class="row" style="margin-top:24px">
+    <button class="primary" id="save">Save</button>
+    <button id="test">Save and test connection</button>
+    <button id="removeKey">Remove stored key</button>
+  </div>
+  <div id="status" role="status"></div>
+  <script src="../core/settings.js"></script>
+  <script src="options.js"></script>
+</body>
+</html>

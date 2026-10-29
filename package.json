@@ -1,0 +1,8 @@
+{
+  "name": "promptrelay",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Chromium extension that improves prompts with Gemini before they are sent to ChatGPT or Claude.",
+  "scripts": { "test": "node --test test/*.test.js" },
+  "license": "MIT"
+}
