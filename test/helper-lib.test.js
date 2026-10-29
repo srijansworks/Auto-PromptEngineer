@@ -40,7 +40,7 @@ test('cursor prompt delimits both texts and tells Cursor not to touch anything',
   assert.ok(p.includes('BEGIN PROMPTRELAY_ORIGINAL_abc') && p.includes('END PROMPTRELAY_CANDIDATE_abc'));
   assert.ok(p.includes('Do not read, create, change or run anything'));
   assert.ok(p.includes('untrusted data'));
-  assert.ok(!p.includes('—'));
+  assert.ok(!p.includes('\u2014'));
 });
 
 const reply = { is_coding: true, redesigned_prompt: 'Goal: add retries.', issues: ['No language given'], changes: ['Added checklist'], assumptions: [] };
