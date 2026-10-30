@@ -39,5 +39,5 @@
 
   const api = { normalize, sameText, findDroppedLiterals };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
-  else (root.PromptRelay = root.PromptRelay || {}).text = api;
+  else (root.AutoPrompter = root.AutoPrompter || {}).text = api;
 })(globalThis);

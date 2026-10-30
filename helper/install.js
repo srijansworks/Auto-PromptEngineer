@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 'use strict';
-// Registers the PromptRelay native messaging host for one Chromium browser on
+// Registers the AutoPrompter native messaging host for one Chromium browser on
 // macOS and records where the Cursor CLI lives.
 //
 //   node helper/install.js [--browser chrome|brave|edge|chromium] [--uninstall]
@@ -86,7 +86,7 @@ function main() {
     JSON.stringify(
       {
         name: lib.HOST_NAME,
-        description: 'PromptRelay helper: runs the Cursor CLI as a second prompt reviewer',
+        description: 'AutoPrompter helper: runs the Cursor CLI as a second prompt reviewer',
         path: wrapper,
         type: 'stdio',
         allowed_origins: ['chrome-extension://' + extId + '/'],
@@ -100,7 +100,7 @@ function main() {
   console.log('  Host manifest: ' + manifestFile);
   console.log('  Extension ID:  ' + extId);
   console.log(cursorBin ? '  Cursor CLI:    ' + cursorBin : '  Cursor CLI:    NOT FOUND. Install it, then run this again.');
-  console.log('Reload the extension in your browser, then use "Test Cursor helper" in PromptRelay settings.');
+  console.log('Reload the extension in your browser, then use "Test Cursor helper" in AutoPrompter settings.');
 }
 
 main();

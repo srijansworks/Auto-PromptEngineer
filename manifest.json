@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "PromptRelay",
+  "name": "AutoPrompter",
   "version": "0.1.0",
   "description": "Improve a prompt with Gemini before you send it to ChatGPT or Claude. You review every change.",
   "minimum_chrome_version": "110",
@@ -15,7 +15,7 @@
     "service_worker": "src/background.js"
   },
   "action": {
-    "default_title": "PromptRelay settings"
+    "default_title": "AutoPrompter settings"
   },
   "options_page": "src/options/options.html",
   "content_scripts": [

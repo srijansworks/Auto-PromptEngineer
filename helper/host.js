@@ -143,7 +143,7 @@ async function main() {
   try {
     res = await handle(await readOneFrame(process.stdin));
   } catch (_) {
-    res = { ok: false, code: 'internal', message: 'The PromptRelay helper hit an internal error.' };
+    res = { ok: false, code: 'internal', message: 'The AutoPrompter helper hit an internal error.' };
   }
   process.stdout.write(lib.encodeFrame(res), () => process.exit(0));
 }

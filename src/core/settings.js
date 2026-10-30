@@ -58,5 +58,5 @@
 
   const api = { DEFAULTS, siteFromHost, sanitize };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
-  else (root.PromptRelay = root.PromptRelay || {}).settings = api;
+  else (root.AutoPrompter = root.AutoPrompter || {}).settings = api;
 })(globalThis);

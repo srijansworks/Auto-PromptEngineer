@@ -32,7 +32,7 @@
   function create(siteId, doc) {
     const cfg = SITES[siteId];
     const sendSel = cfg.send.join(',');
-    const T = root.PromptRelay.text;
+    const T = root.AutoPrompter.text;
 
     function composers() {
       const out = [];
@@ -147,5 +147,5 @@
     };
   }
 
-  (root.PromptRelay = root.PromptRelay || {}).adapters = { SITES, create };
+  (root.AutoPrompter = root.AutoPrompter || {}).adapters = { SITES, create };
 })(globalThis);

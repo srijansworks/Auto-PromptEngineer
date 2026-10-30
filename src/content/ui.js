@@ -6,7 +6,8 @@
     @media (prefers-color-scheme: dark) {
       .pr { --bg:#222226; --fg:#ececf1; --muted:#a0a0aa; --line:#44444c; --accent:#7b9bff; --accent-fg:#101018; --warn-bg:#3a3017; --warn-fg:#f0d589; --err-bg:#3d1f1f; --err-fg:#f3b0b0; --pane:#2b2b30; }
     }
-    .fab { position:fixed; z-index:2147483000; display:none; padding:5px 11px; border-radius:14px; border:1px solid var(--line); background:var(--bg); color:var(--fg); font-size:12.5px; line-height:1.2; cursor:pointer; box-shadow:0 1px 4px rgba(0,0,0,.18); }
+    .toolbar { position:fixed; z-index:2147483000; display:none; gap:6px; align-items:center; }
+    .fab { padding:5px 11px; border-radius:14px; border:1px solid var(--line); background:var(--bg); color:var(--fg); font-size:12.5px; line-height:1.2; cursor:pointer; box-shadow:0 1px 4px rgba(0,0,0,.18); }
     .fab:hover { border-color:var(--accent); }
     .fab[disabled] { opacity:.55; cursor:default; }
     .fab .tag { margin-left:6px; padding:1px 6px; border-radius:8px; background:var(--accent); color:var(--accent-fg); font-size:10.5px; }
@@ -63,13 +64,21 @@
     const wrap = h('div', { class: 'pr' });
     shadow.append(h('style', {}, CSS), wrap);
 
+    const toolbar = h('div', { class: 'toolbar' });
+    const interceptToggle = h('button', { class: 'fab', type: 'button', role: 'switch', 'aria-checked': 'false', title: 'Turn automatic prompt interception on or off for this site' }, 'Intercept: off');
+    interceptToggle.addEventListener('mousedown', (e) => e.preventDefault());
+    interceptToggle.addEventListener('click', async () => {
+      interceptToggle.disabled = true;
+      try { await cb.onToggleIntercept(); } finally { interceptToggle.disabled = false; }
+    });
     const fab = h('button', { class: 'fab', type: 'button', title: 'Improve this prompt with Gemini' }, 'Improve prompt');
     // Keep focus and selection in the composer when the button is pressed.
     fab.addEventListener('mousedown', (e) => e.preventDefault());
     fab.addEventListener('click', () => cb.onImprove());
-    const overlay = h('div', { class: 'overlay', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'PromptRelay review' });
+    const overlay = h('div', { class: 'overlay', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'AutoPrompter review' });
     const toast = h('div', { class: 'toast', role: 'status' });
-    wrap.append(fab, overlay, toast);
+    toolbar.append(fab, interceptToggle);
+    wrap.append(toolbar, overlay, toast);
 
     // Stop key events inside the panel from reaching page shortcuts.
     for (const t of ['keydown', 'keyup', 'keypress']) host.addEventListener(t, (e) => e.stopPropagation());
@@ -94,7 +103,7 @@
       panelEl = h(
         'div',
         { class: 'panel' },
-        h('div', { class: 'head' }, h('h2', {}, 'PromptRelay'), h('span', { class: 'sub' }, sub)),
+        h('div', { class: 'head' }, h('h2', {}, 'AutoPrompter'), h('span', { class: 'sub' }, sub)),
         h('div', { class: 'body' }, noticeBox = h('div', { class: 'notice' }), bodyNodes),
         h('div', { class: 'foot' }, footNodes)
       );
@@ -116,21 +125,25 @@
 
       position(rect, visible) {
         if (!visible || !rect) {
-          fab.style.display = 'none';
+          toolbar.style.display = 'none';
           return;
         }
-        fab.style.display = 'block';
-        const top = Math.max(4, rect.top - fab.offsetHeight - 6);
-        fab.style.top = top + 'px';
-        fab.style.left = Math.max(4, rect.right - fab.offsetWidth - 8) + 'px';
+        toolbar.style.display = 'flex';
+        const top = Math.max(4, rect.top - toolbar.offsetHeight - 6);
+        toolbar.style.top = top + 'px';
+        toolbar.style.left = Math.max(4, rect.right - toolbar.offsetWidth - 8) + 'px';
       },
 
       setIntercept(on) {
-        fab.replaceChildren('Improve prompt', on ? h('span', { class: 'tag' }, 'Intercept on') : null);
+        interceptToggle.textContent = 'Intercept: ' + (on ? 'on' : 'off');
+        interceptToggle.setAttribute('aria-checked', String(on));
+        interceptToggle.setAttribute('aria-label', 'Intercept prompts on this site');
+        interceptToggle.style.borderColor = on ? 'var(--accent)' : '';
       },
 
       setBusy(busy) {
         fab.disabled = busy;
+        interceptToggle.disabled = busy;
       },
 
       toast(msg) {
@@ -285,5 +298,5 @@
     return api;
   }
 
-  (root.PromptRelay = root.PromptRelay || {}).ui = { create };
+  (root.AutoPrompter = root.AutoPrompter || {}).ui = { create };
 })(globalThis);

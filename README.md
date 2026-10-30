@@ -1,8 +1,8 @@
-# PromptRelay
+# AutoPrompter
 
-PromptRelay is a personal Chromium extension. You write a prompt in ChatGPT or Claude, click Improve prompt, and Gemini rewrites it into a detailed, numbered, specific prompt without changing what you want. You review the result, edit it if you like, and decide what gets sent.
+AutoPrompter is a personal Chromium extension. You write a prompt in ChatGPT or Claude, click Improve prompt, and Gemini rewrites it into a detailed, numbered, specific prompt without changing what you want. You review the result, edit it if you like, and decide what gets sent.
 
-The final answer is still generated in your normal ChatGPT or Claude browser session. PromptRelay does not call any OpenAI or Anthropic API.
+The final answer is still generated in your normal ChatGPT or Claude browser session. AutoPrompter does not call any OpenAI or Anthropic API.
 
 ## What it is not
 
@@ -18,7 +18,7 @@ Requirements: macOS, a Chromium browser with Manifest V3 support (Chrome, Brave,
 
 1. Open `chrome://extensions` and turn on Developer mode.
 2. Click Load unpacked and choose this folder (the one that contains `manifest.json`).
-3. Click the PromptRelay toolbar icon. It opens the settings page.
+3. Click the AutoPrompter toolbar icon. It opens the settings page.
 4. Paste your Gemini API key, check the model name, and click Save and test connection.
 5. Open chatgpt.com or claude.ai and reload the tab.
 
@@ -52,7 +52,7 @@ Gemini follows these rules most of the time, not always. Review the result befor
 
 ## Interception mode (opt in, per site)
 
-Turn it on in settings for ChatGPT, Claude, or both. When on, PromptRelay opens the review panel before these tested submission paths send your text:
+Use the **Intercept: on/off** switch beside Improve prompt to toggle interception for the current site. The choice is saved per site and also appears in settings. With interception off, you can still click Improve prompt manually. When on, AutoPrompter opens the review panel before these tested submission paths send your text:
 
 - Enter in the main message box
 - Ctrl or Cmd plus Enter in the main message box
@@ -104,7 +104,7 @@ node helper/install.js --browser chrome
 
    Use `brave`, `edge` or `chromium` for those browsers. Run it again if you install Cursor later or move the project folder. `node helper/install.js --uninstall` removes everything it created.
 3. Reload the extension at `chrome://extensions`.
-4. In PromptRelay settings, tick the Cursor option and click Test Cursor helper. It reports the Cursor version and whether you are signed in.
+4. In AutoPrompter settings, tick the Cursor option and click Test Cursor helper. It reports the Cursor version and whether you are signed in.
 
 The extension has a fixed ID, set by the `key` field in `manifest.json`, so the installer can authorize it without you looking anything up. Only that extension can talk to the helper.
 

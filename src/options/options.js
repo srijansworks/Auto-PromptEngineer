@@ -1,5 +1,5 @@
 (function () {
-  const S = globalThis.PromptRelay.settings;
+  const S = globalThis.AutoPrompter.settings;
   const $ = (id) => document.getElementById(id);
   const KEY_NAME = 'geminiApiKey';
   const SITES = ['chatgpt', 'claude'];

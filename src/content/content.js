@@ -1,11 +1,11 @@
 (function () {
-  const PR = globalThis.PromptRelay;
+  const PR = globalThis.AutoPrompter;
   const siteId = PR.settings.siteFromHost(location.hostname);
   if (!siteId || window.top !== window) return;
 
   const adapter = PR.adapters.create(siteId, document);
   let settings = PR.settings.sanitize(null);
-  // session is non-null exactly while the PromptRelay panel is open.
+  // session is non-null exactly while the AutoPrompter panel is open.
   const state = { session: null, bypass: false, counter: 0 };
 
   const siteCfg = () => settings.sites[siteId];
@@ -19,7 +19,7 @@
       return {
         ok: false,
         code: 'context',
-        message: 'PromptRelay was reloaded or disabled. Refresh this page and try again.',
+        message: 'AutoPrompter was reloaded or disabled. Refresh this page and try again.',
       };
     }
   }
@@ -28,6 +28,19 @@
 
   const ui = PR.ui.create({
     onImprove: () => start('manual'),
+    onToggleIntercept: async () => {
+      try {
+        const saved = await chrome.storage.sync.get('settings');
+        const next = PR.settings.sanitize(saved.settings);
+        next.sites[siteId].intercept = !next.sites[siteId].intercept;
+        await chrome.storage.sync.set({ settings: next });
+        settings = next;
+        ui.setIntercept(siteCfg().intercept);
+        schedule();
+      } catch (_) {
+        ui.toast('Could not save interception setting. Refresh this page and try again.');
+      }
+    },
     onCancel: () => close(),
     onRetry: () => run(),
     onReplace: (text) => replace(text, false),
@@ -73,7 +86,7 @@
     if (state.session) return;
     const composer = adapter.getComposer();
     if (!composer) {
-      ui.toast('PromptRelay could not find the message box on this page.');
+      ui.toast('AutoPrompter could not find the message box on this page.');
       return;
     }
     const original = adapter.readText(composer);

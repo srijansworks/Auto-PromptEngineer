@@ -113,7 +113,7 @@ function extractJson(text) {
 
 function parseCursorOutput(text) {
   const v = extractJson(String(text || ''));
-  if (!v) return { ok: false, code: 'bad_output', message: 'Cursor replied in a format PromptRelay could not read. Try again.' };
+  if (!v) return { ok: false, code: 'bad_output', message: 'Cursor replied in a format AutoPrompter could not read. Try again.' };
   const isCoding = v.is_coding !== false;
   const redesigned = typeof v.redesigned_prompt === 'string' ? v.redesigned_prompt.replace(/\r\n?/g, '\n').trim() : '';
   if (isCoding && !redesigned) {

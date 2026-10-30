@@ -98,5 +98,5 @@
 
   const api = { SYSTEM_FAITHFUL, SYSTEM_EXPAND, systemInstruction, RESPONSE_SCHEMA, buildUserMessage };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
-  else (root.PromptRelay = root.PromptRelay || {}).optimizerPrompt = api;
+  else (root.AutoPrompter = root.AutoPrompter || {}).optimizerPrompt = api;
 })(globalThis);

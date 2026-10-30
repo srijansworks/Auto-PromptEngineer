@@ -2,7 +2,7 @@
   const prompt =
     typeof module !== 'undefined' && module.exports
       ? require('./optimizer-prompt')
-      : root.PromptRelay.optimizerPrompt;
+      : root.AutoPrompter.optimizerPrompt;
 
   const ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/models/';
 
@@ -41,7 +41,7 @@
     const apiMsg = short(data && data.error && data.error.message);
     const detail = apiMsg ? ' Details: ' + apiMsg : '';
     if (status === 400 && /api key/i.test(apiMsg)) {
-      return fail('bad_key', 'Gemini rejected the API key. Check it in PromptRelay settings.');
+      return fail('bad_key', 'Gemini rejected the API key. Check it in AutoPrompter settings.');
     }
     if (status === 401 || status === 403) {
       return fail('bad_key', 'Gemini refused the request (key invalid or not permitted).' + detail);
@@ -101,7 +101,7 @@
   }
 
   async function optimize({ fetchImpl, apiKey, model, text, timeoutMs, maxChars, nonce, style, profile }) {
-    if (!apiKey) return fail('no_key', 'No Gemini API key is set. Open PromptRelay settings and add one.');
+    if (!apiKey) return fail('no_key', 'No Gemini API key is set. Open AutoPrompter settings and add one.');
     if (!text || !text.trim()) return fail('empty', 'There is no text to improve.');
     if (text.length > maxChars) {
       return fail('too_long', 'The prompt is ' + text.length + ' characters. The limit is ' + maxChars + '.');
@@ -138,5 +138,5 @@
 
   const api = { buildRequest, parseResponse, optimize };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
-  else (root.PromptRelay = root.PromptRelay || {}).gemini = api;
+  else (root.AutoPrompter = root.AutoPrompter || {}).gemini = api;
 })(globalThis);

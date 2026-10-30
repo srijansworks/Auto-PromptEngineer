@@ -4,7 +4,7 @@ importScripts(
   'core/gemini.js'
 );
 
-const PR = globalThis.PromptRelay;
+const PR = globalThis.AutoPrompter;
 const KEY_NAME = 'geminiApiKey';
 
 // The API key lives in storage.local and is readable only from extension
@@ -47,7 +47,7 @@ function callHost(payload) {
         resolve({
           ok: false,
           code: 'no_helper',
-          message: 'The PromptRelay helper is not installed. Run "node helper/install.js" from the project folder, then reload the extension.',
+          message: 'The AutoPrompter helper is not installed. Run "node helper/install.js" from the project folder, then reload the extension.',
         });
       } else {
         resolve(res);
@@ -64,7 +64,8 @@ async function handle(msg, sender) {
   if (sender.id !== chrome.runtime.id || !msg || typeof msg.type !== 'string') {
     return { ok: false, code: 'forbidden', message: 'Unexpected sender.' };
   }
-  const fromTab = Boolean(sender.tab);
+  // An extension options page may itself be hosted in a browser tab.
+  const fromTab = Boolean(sender.tab) && sender.url !== chrome.runtime.getURL('src/options/options.html');
 
   if (msg.type === 'optimize') {
     if (typeof msg.text !== 'string') return { ok: false, code: 'empty', message: 'There is no text to improve.' };
@@ -75,7 +76,7 @@ async function handle(msg, sender) {
       } catch (_) {}
       const settings = await loadSettings();
       if (!site || !settings.sites[site].enabled) {
-        return { ok: false, code: 'forbidden', message: 'PromptRelay is disabled on this site.' };
+        return { ok: false, code: 'forbidden', message: 'AutoPrompter is disabled on this site.' };
       }
     }
     return runOptimize(msg.text);
@@ -87,7 +88,7 @@ async function handle(msg, sender) {
     }
     const settings = await loadSettings();
     if (!settings.cursor.enabled) {
-      return { ok: false, code: 'forbidden', message: 'Cursor review is turned off in PromptRelay settings.' };
+      return { ok: false, code: 'forbidden', message: 'Cursor review is turned off in AutoPrompter settings.' };
     }
     if (fromTab) {
       let site = null;
@@ -95,7 +96,7 @@ async function handle(msg, sender) {
         site = PR.settings.siteFromHost(new URL(sender.tab.url).hostname);
       } catch (_) {}
       if (!site || !settings.sites[site].enabled) {
-        return { ok: false, code: 'forbidden', message: 'PromptRelay is disabled on this site.' };
+        return { ok: false, code: 'forbidden', message: 'AutoPrompter is disabled on this site.' };
       }
     }
     return callHost({ type: 'review', original: msg.original, improved: msg.improved });
@@ -116,7 +117,7 @@ async function handle(msg, sender) {
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   handle(msg, sender).then(sendResponse, () =>
-    sendResponse({ ok: false, code: 'internal', message: 'PromptRelay hit an internal error.' })
+    sendResponse({ ok: false, code: 'internal', message: 'AutoPrompter hit an internal error.' })
   );
   return true;
 });

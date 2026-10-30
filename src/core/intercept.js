@@ -6,8 +6,8 @@
   //   targetInComposer  the event target is inside the active supported composer
   //   interceptEnabled  interception mode is on for this site
   //   hasText           the composer holds non-whitespace text
-  //   busy              the PromptRelay panel is open (a modal flow is running)
-  //   bypass            PromptRelay itself is submitting an approved prompt
+  //   busy              the AutoPrompter panel is open (a modal flow is running)
+  //   bypass            AutoPrompter itself is submitting an approved prompt
 
   function isSendKey(ev) {
     // Shift+Enter and Alt+Enter are newlines. Ctrl or Cmd+Enter is a send
@@ -34,5 +34,5 @@
 
   const api = { isSendKey, shouldInterceptKey, shouldInterceptClick };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
-  else (root.PromptRelay = root.PromptRelay || {}).intercept = api;
+  else (root.AutoPrompter = root.AutoPrompter || {}).intercept = api;
 })(globalThis);
